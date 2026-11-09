@@ -1,8 +1,10 @@
 """Compare independent eager/FlashAttention executions on a real CUDA backend."""
 import copy
+from pathlib import Path
 
 import pytest
 import torch
+from transformers import AutoModelForCausalLM
 from transformers.cache_utils import DynamicCache
 from transformers.utils import is_flash_attn_2_available
 
@@ -27,7 +29,7 @@ def models(dtype=torch.bfloat16, dropout=0.0):
     fa_cfg._attn_implementation = 'flash_attention_2'
     flash = implementation.GPTNeoXForCausalLM(fa_cfg).cuda().to(dtype).eval()
     flash.load_state_dict(eager.state_dict())
-    assert isinstance(eager.gpt_neox.layers[0].attention, implementation.GPTNeoXAttention)
+    assert type(eager.gpt_neox.layers[0].attention) is implementation.GPTNeoXAttention
     assert isinstance(flash.gpt_neox.layers[0].attention, implementation.GPTNeoXFlashAttention2)
     return eager, flash
 
@@ -36,10 +38,19 @@ def close(actual, expected, dtype, gradient=False):
     assert torch.isfinite(actual).all() and torch.isfinite(expected).all()
     a, b = actual.float(), expected.float()
     # Check both absolute and relative errors; low precision is not bitwise exact.
-    rtol = 0.04 if dtype == torch.bfloat16 else 0.006
-    atol = 0.004 if dtype == torch.bfloat16 else 0.0008
+    # BF16 has only seven fraction bits: allow one epsilon in absolute
+    # output error, and four epsilons in relative/norm error across two layers.
+    rtol = 4 * torch.finfo(dtype).eps
+    atol = torch.finfo(dtype).eps
     if gradient:
-        rtol *= 2
+        # Gradients scale with the arbitrary upstream objective. A fixed pointwise
+        # atol/rtol unfairly rejects cancellation near zero; use L2 and Linf norms.
+        budget = 4 * torch.finfo(dtype).eps
+        scale = b.abs().max().clamp_min(1e-7)
+        assert (a-b).abs().max() <= budget * scale + 1e-7
+        relative_l2 = (a-b).norm() / b.norm().clamp_min(1e-7)
+        assert relative_l2 < budget, f'gradient relative L2 error {relative_l2.item():.5f}'
+        return
     torch.testing.assert_close(a, b, atol=atol, rtol=rtol)
     relative_l2 = (a-b).norm() / b.norm().clamp_min(1e-10)
     assert relative_l2 < rtol, f'relative L2 error {relative_l2.item():.5f}'
@@ -50,6 +61,7 @@ def close(actual, expected, dtype, gradient=False):
 @pytest.mark.parametrize('padding', ['none', 'left', 'right'])
 def test_logits_loss_and_backward(dtype, batch, length, padding):
     eager, flash = models(dtype)
+    reference = copy.deepcopy(eager).float()
     ids = torch.randint(1, 256, (batch, length), device='cuda')
     mask = torch.ones_like(ids)
     if padding != 'none' and length > 1:
@@ -63,22 +75,26 @@ def test_logits_loss_and_backward(dtype, batch, length, padding):
         labels[:, 1:].masked_fill_(mask[:, :-1] == 0, -100)
     # One-token causal LM losses have no targets; still exercise outputs/gradients.
     outputs = []
-    for model in (eager, flash):
+    for model in (eager, flash, reference):
         out = model(input_ids=ids, attention_mask=mask, labels=labels if length > 1 else None)
         outputs.append(out)
     close(outputs[1].logits[mask.bool()], outputs[0].logits[mask.bool()], dtype)
+    for out in outputs[:2]:
+        close(out.logits[mask.bool()], outputs[2].logits[mask.bool()], dtype)
     if length > 1:
         close(outputs[1].loss, outputs[0].loss, dtype)
     upstream = torch.randn_like(outputs[0].logits, dtype=torch.float32)
     upstream *= mask.unsqueeze(-1)
     for out in outputs:
         (out.logits.float()*upstream).sum().backward()
-    for (name, ep), (_, fp) in zip(eager.named_parameters(), flash.named_parameters()):
+    for (name, ep), (_, fp), (_, rp) in zip(eager.named_parameters(), flash.named_parameters(), reference.named_parameters()):
         if ep.grad is None:
             assert fp.grad is None, name
         else:
             assert fp.grad is not None, name
             close(fp.grad, ep.grad, dtype, gradient=True)
+            close(fp.grad, rp.grad, dtype, gradient=True)
+            close(ep.grad, rp.grad, dtype, gradient=True)
 
 
 @pytest.mark.parametrize('dtype', [torch.float16, torch.bfloat16])
@@ -136,3 +152,20 @@ def test_dropout_switch_and_attention_return(monkeypatch):
     assert out.attentions == (None, None)
     with pytest.raises(ValueError, match='head_mask'):
         flash(ids, head_mask=torch.ones(2, device='cuda'))
+
+
+def test_downloaded_160m_checkpoint_forward_backward():
+    checkpoint = Path(__file__).resolve().parents[1]/'models/GPTNeoX-160m'
+    if not (checkpoint/'model.safetensors').exists():
+        pytest.skip('Download the supplied initialization for the 160M integration smoke check.')
+    model = AutoModelForCausalLM.from_pretrained(checkpoint, torch_dtype=torch.bfloat16,
+                                              attn_implementation='flash_attention_2', trust_remote_code=True).cuda()
+    assert type(model.gpt_neox.layers[0].attention).__name__ == 'GPTNeoXFlashAttention2'
+    ids = torch.randint(1, model.config.vocab_size, (1, 64), device='cuda')
+    model.train()
+    with torch.autocast('cuda', dtype=torch.bfloat16):
+        out = model(input_ids=ids, labels=ids, use_cache=False)
+    assert torch.isfinite(out.loss)
+    out.loss.backward()
+    grad = model.gpt_neox.layers[0].attention.query_key_value.weight.grad
+    assert grad is not None and torch.isfinite(grad).all() and grad.float().norm() > 0

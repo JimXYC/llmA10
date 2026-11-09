@@ -1,0 +1,30 @@
+{
+  "status": "passed",
+  "tests": 36,
+  "failures": 0,
+  "errors": 0,
+  "skipped": 0,
+  "pytest_seconds": 11.248,
+  "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+  "torch": "2.4.1+cu124",
+  "flash_attention": "2.6.3",
+  "implementation_sha256": "c4f8cb87a70842b971ddf6ad5c1628dcb4b83012214da93310e57dfb87a72a3e",
+  "test_file_sha256": "90071848daed6194cdd709ee776b1de804a4611ff6fded52ba7026ad653e25af",
+  "fp32_reference": true,
+  "forward_tolerance": "Absolute epsilon and relative 4*epsilon for the tested low-precision dtype.",
+  "gradient_tolerance": "Relative L2 and normalized maximum absolute error, each within 4*epsilon.",
+  "coverage": [
+    "FP16/BF16 logits and loss",
+    "all parameter gradients vs eager and FP32 reference",
+    "sequence lengths 1,17,512,2048",
+    "left/right padding",
+    "strict causal non-leakage",
+    "single/multi-token KV cache with left padding",
+    "dropout train/eval behavior",
+    "real downloaded 160M BF16 forward/backward"
+  ],
+  "full_q12_training_started": false,
+  "initial_weights_sha256": "3a404de6fc25da2051b82deb74cefcde60ff62a81b54d745e4eca8ce4b17ba49",
+  "q11_checkpoint_source_sha256": "44457dd5ac3e6be869267c4f726abb3ed31724045117c04775f955c3ba1e174c",
+  "q11_initialization_weights_unchanged": true
+}

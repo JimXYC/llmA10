@@ -41,3 +41,5 @@ tmp/
 
 # Temporary three-step Trainer test configurations
 **/configs/smoke-trainer*.json
+
+**/.pytest_cache/

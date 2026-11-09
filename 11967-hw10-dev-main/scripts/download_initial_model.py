@@ -5,10 +5,9 @@ import sys
 import urllib.request
 from pathlib import Path
 
-repo = 'jmvcoelho/GPTNeoX-160m'
-with urllib.request.urlopen(f'https://huggingface.co/api/models/{repo}', timeout=60) as response:
-    info = json.load(response)
-revision = info['sha']
+provenance = json.loads((Path(__file__).resolve().parents[1]/'model_src/SOURCE.json').read_text())
+repo = provenance['repository']
+revision = provenance['revision']
 files = ['config.json', 'config_custom.py', 'generation_config.json', 'modeling_custom.py',
          'model.safetensors', 'special_tokens_map.json', 'tokenizer.json', 'tokenizer_config.json']
 root = Path('models/GPTNeoX-160m')
