@@ -1,4 +1,4 @@
-mkdir -p models/GPTNeoX-160m
-cd models/GPTNeoX-160m
-huggingface-cli download jmvcoelho/GPTNeoX-160m --local-dir .
-cd ../..
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")"
+"${A10_PYTHON:-python}" scripts/download_initial_model.py

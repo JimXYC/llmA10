@@ -1,5 +1,7 @@
 """Download the supplied public initialization at one recorded HF revision."""
 import json
+import subprocess
+import sys
 import urllib.request
 from pathlib import Path
 
@@ -18,3 +20,5 @@ for name in files:
     partial.replace(root / name)
 (root / 'initialization_revision.json').write_text(json.dumps(dict(repo=repo, revision=revision, files=files), indent=2)+'\n')
 print('Initialization download complete.', flush=True)
+
+subprocess.run([sys.executable, str(Path(__file__).resolve().with_name("install_custom_model.py"))], check=True)

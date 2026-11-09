@@ -15,7 +15,7 @@ The HKU helper scripts install Q1.1 dependencies, perform a short eager-training
 
 ## Current status
 
-**Q1.1 is complete.** The full run succeeded on an RTX 4080 SUPER on 2026-11-09. Q1.2 and Q1.3 remain unimplemented.
+**Q1.1 is complete.** The full run succeeded on an RTX 4080 SUPER on 2026-11-09. Q1.2 code is implemented; CUDA validation is pending. Q1.2 full training and Q1.3 remain pending.
 
 | Metric | Measured result |
 | --- | ---: |
@@ -60,3 +60,28 @@ bash scripts/launch_q11_hku.sh
 The training command starts a full experiment; it is not part of environment setup. Observe the school's allocated GPU visibility instead of using the GPU3-specific activation script. Preserve trained models for subsequent questions.
 
 Local credentials, SSH connection files, machine-specific notes, model weights, environment directories, logs, and temporary LaTeX outputs are excluded from Git.
+
+## Q1.2 code and tests
+
+`11967-hw10-dev-main/model_src/` versions the supplied custom model source, with only the FlashAttention forward implementation changed. Model weights stay outside Git. `scripts/install_custom_model.py` copies that implementation into the downloaded initialization directory and preserves the original Python source. It does not modify the Q1.1 trained checkpoint or model weights. The initialization downloader applies it after downloading.
+
+The implementation converts Q/K/V to the FlashAttention layout, forwards the padding mask, causal alignment and training dropout, and merges the attention heads before output projection. Dense attention probabilities are not returned by this backend; head masks raise an explicit error.
+
+On an allocated school compute node, using the existing HW10 environment:
+
+```bash
+cd 11967-hw10-dev-main
+$HOME/hw10-env/bin/python scripts/setup_hku_flash.py
+$HOME/hw10-env/bin/python scripts/install_custom_model.py
+$HOME/hw10-env/bin/python -m pytest tests/test_flash_attention.py -v
+```
+
+The installer selects the matching wheel from the official FlashAttention 2.6.3 GitHub release without replacing PyTorch. Tests compare eager and real FlashAttention outputs, losses and all parameter gradients in FP16/BF16, including 512/2048-token contexts, left/right padding, causal non-leakage, cached single/multiple-token decoding, and dropout behavior. GPU tests are skipped if CUDA/FlashAttention is absent; a skipped suite is not successful CUDA validation.
+
+`configs/512_flash_wikitext.json` starts from the same random initialization and keeps Q1.1 hyperparameters, changing only the attention backend and output/run names. The full training command is:
+
+```bash
+$HOME/hw10-env/bin/python lm_train.py configs/512_flash_wikitext.json
+```
+
+Full Q1.2 training has not been run as part of the code-only implementation.

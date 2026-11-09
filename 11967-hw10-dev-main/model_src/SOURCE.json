@@ -1,0 +1,7 @@
+{
+  "repository": "jmvcoelho/GPTNeoX-160m",
+  "revision": "e3618df5be9a655761008a305a402f9819a50f05",
+  "original_modeling_custom_sha256": "44457dd5ac3e6be869267c4f726abb3ed31724045117c04775f955c3ba1e174c",
+  "changes": "Q1.2 GPTNeoXFlashAttention2.forward implementation; configuration source is unchanged.",
+  "license": "Original Apache-2.0 headers preserved."
+}
