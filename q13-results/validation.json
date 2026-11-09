@@ -1,0 +1,49 @@
+{
+  "status": "passed",
+  "source_commit": "a461d70f209192cc848acbfb9b6b79fa8fc660c8",
+  "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+  "variants": {
+    "retrofit": {
+      "exit_code": 0,
+      "completed_steps": 3566,
+      "max_steps": 3566,
+      "epoch": 0.9998598065330155,
+      "model_to_train": "models/GPTNeoX-160M-WikiText-512-flash",
+      "source_weights_sha256": "650e0e0923569869206a839df0ecbf99843116782b69d4cefb163bf2e2681f22",
+      "source_hash_matches_preserved_checkpoint": true,
+      "finite_perplexities": true,
+      "config_sha256": "e0139389466ca87766508ca9aafeb66b231a94d2b4464ebaa4f51828caeb4bef"
+    },
+    "scratch": {
+      "exit_code": 0,
+      "completed_steps": 3566,
+      "max_steps": 3566,
+      "epoch": 0.9998598065330155,
+      "model_to_train": "models/GPTNeoX-160m",
+      "source_weights_sha256": "3a404de6fc25da2051b82deb74cefcde60ff62a81b54d745e4eca8ce4b17ba49",
+      "source_hash_matches_preserved_checkpoint": true,
+      "finite_perplexities": true,
+      "config_sha256": "e6e85a8f1cfafafe138f55a85ef2f568513c39e555d06d1a6ea62380cd90495a"
+    }
+  },
+  "paired_config_differences": [
+    "model_to_train",
+    "output_dir",
+    "run_name"
+  ],
+  "q11_q12_tex_preserved": true,
+  "pdf_review": {
+    "pages": 3,
+    "all_pages_rendered_and_visually_checked": true,
+    "latex_overfull_or_underfull_warnings": false,
+    "q13_subsections_complete": [
+      "A",
+      "B",
+      "C",
+      "D",
+      "E"
+    ],
+    "q13_b_sentence_count": 2,
+    "pdf_sha256": "fa2990ef541ffc26b3eb672e8b5cef99e4431012b5a76ed7ac4048f3b3c3f5c5"
+  }
+}

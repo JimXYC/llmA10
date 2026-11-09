@@ -1,0 +1,27 @@
+{
+  "status": "complete",
+  "batch_limits": {
+    "eager_no_gc": 2,
+    "flash_gc": 9
+  },
+  "chosen_batch": 4,
+  "gradient_accumulation": 2,
+  "variants": {
+    "retrofit": {
+      "ppl_512": 38.745721253147146,
+      "ppl_2048": 43.84257232268267,
+      "training_seconds": 1162.2162,
+      "peak_allocated_mib": 6218.595703125,
+      "peak_reserved_mib": 7828.0,
+      "peak_device_sampled_mib": 8150.0
+    },
+    "scratch": {
+      "ppl_512": 214.48010670315236,
+      "ppl_2048": 230.3379408885888,
+      "training_seconds": 1162.33,
+      "peak_allocated_mib": 6218.595703125,
+      "peak_reserved_mib": 7828.0,
+      "peak_device_sampled_mib": 8150.0
+    }
+  }
+}

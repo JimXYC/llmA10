@@ -1,0 +1,37 @@
+{
+  "train": {
+    "train_runtime": 1162.2162,
+    "train_samples_per_second": 24.549,
+    "train_steps_per_second": 3.068,
+    "train_loss": 3.810724362187752,
+    "epoch": 0.9998598065330155
+  },
+  "peak_allocated_mib": 6218.595703125,
+  "peak_reserved_mib": 7828.0,
+  "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+  "torch_version": "2.4.1+cu124",
+  "seq_len": 2048,
+  "attention_type": "flash_attention_2",
+  "gradient_checkpointing": true,
+  "gradient_checkpointing_kwargs": {
+    "use_reentrant": false
+  },
+  "train_examples": 28531,
+  "train_tokens": 58431488,
+  "validation_512": {
+    "eval_loss": 3.657020330429077,
+    "eval_runtime": 1.5405,
+    "eval_samples_per_second": 150.6,
+    "eval_steps_per_second": 75.3,
+    "epoch": 0.9998598065330155,
+    "perplexity": 38.745721253147146
+  },
+  "validation_2048": {
+    "eval_loss": 3.7806053161621094,
+    "eval_runtime": 0.8345,
+    "eval_samples_per_second": 75.497,
+    "eval_steps_per_second": 38.347,
+    "epoch": 0.9998598065330155,
+    "perplexity": 43.84257232268267
+  }
+}

@@ -73,8 +73,45 @@ FlashAttention tiles Q/K/V computation and performs online softmax using on-chip
 \clearpage
 \section*{Question 1.3 (5 points)}
 \subsection*{1.3.A}
+On the RTX 4080 SUPER, I measured per-device batch limits using BF16, length 2048, the same Q1.2 checkpoint, accumulation 1, and a fresh process for every candidate. Each successful candidate completed three actual Trainer optimizer steps, including optimizer-state allocation; generation KV caching was disabled in both settings.
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Setting & Largest passed batch & Next batch (OOM) \\
+\midrule
+Eager, checkpointing off & 2 & 3 \\
+FlashAttention 2, checkpointing on & 9 & 10 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+These limits describe this fixed-shape three-step training probe. For the complete runs I used batch 4 with 2 accumulation steps to retain memory headroom.
+
 \subsection*{1.3.B}
+Gradient checkpointing keeps selected activations from the forward pass and recomputes missing intermediates during backpropagation. It reduces activation memory at the cost of additional computation, which can make training slower (\href{https://github.com/cybertronai/gradient-checkpointing}{linked reference}).
+
 \subsection*{1.3.C}
+I continued from Q1.2 for one epoch on 28,531 length-2048 WikiText sequences (58,431,488 tokens), using FlashAttention 2, non-reentrant checkpointing and BF16. Batch 4 and accumulation 2 give 16,384 tokens per update; I used peak learning rate $10^{-4}$, 1\% warmup, cosine decay, AdamW, and seed 42. The matched scratch control uses the same settings.
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Metric & Continued from Q1.2 & From scratch \\
+\midrule
+Validation perplexity, length 512 & 38.75 & 214.48 \\
+Validation perplexity, length 2048 & 43.84 & 230.34 \\
+Training time (seconds) & 1162.22 & 1162.33 \\
+Peak allocated training VRAM (MiB) & 6218.60 & 6218.60 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Timing includes epoch-end validation and excludes saving/final validations, as in Q1.1/Q1.2. Allocated training peaks are captured before final validation. Reserved peaks were 7828/7828 MiB, and whole-run device sampling peaks were 8150/8150 MiB (continued/scratch).
+
 \subsection*{1.3.D}
+The 2048-token perplexity decreased from 137.02 in Q1.2 (137.58 in Q1.1) to 43.84. The model now trains on the longer positions and relative attention distances used at evaluation, reducing the context-length mismatch; additional WikiText training also improves its predictions.
+
 \subsection*{1.3.E}
+The scratch model starts from the supplied initialization, with the same 2048-token data, hyperparameters and one-epoch budget as the continuation run. It reached perplexities 214.48/230.34, compared with 38.75/43.84 for continuation (512/2048). The lower continuation perplexities are consistent with the benefit of the language-model knowledge already learned in Q1.2. The continued model has also received the earlier 512-token training in Q1.2, giving it more total training exposure and compute; this comparison does not isolate curriculum effects at equal total training budget.
 \end{document}

@@ -1,0 +1,143 @@
+{
+  "variant": "scratch",
+  "config_file": "/userhome/cs/u3675384/llmA10/11967-hw10-dev-main/configs/2048_flash_gc_scratch_wikitext.json",
+  "config": {
+    "model_to_train": "models/GPTNeoX-160m",
+    "output_dir": "models/GPTNeoX-160M-WikiText-2048-scratch",
+    "run_name": "GPTNeoX-160M-WikiText-2048-scratch",
+    "report_to": "wandb",
+    "eval_strategy": "epoch",
+    "logging_steps": 25,
+    "num_train_epochs": 1,
+    "save_strategy": "no",
+    "bf16": true,
+    "seq_len": 2048,
+    "attention_type": "flash_attention_2",
+    "gradient_checkpointing": true,
+    "dataset": "wikitext",
+    "deepspeed": null,
+    "per_device_train_batch_size": 4,
+    "learning_rate": 0.0001,
+    "weight_decay": 0.1,
+    "warmup_ratio": 0.01,
+    "lr_scheduler_type": "cosine",
+    "per_device_eval_batch_size": 2,
+    "seed": 42,
+    "data_seed": 42,
+    "optim": "adamw_torch",
+    "adam_beta1": 0.9,
+    "adam_beta2": 0.95,
+    "adam_epsilon": 1e-08,
+    "max_grad_norm": 1.0,
+    "disable_tqdm": true,
+    "dataloader_num_workers": 2,
+    "gradient_accumulation_steps": 2,
+    "gradient_checkpointing_kwargs": {
+      "use_reentrant": false
+    }
+  },
+  "model": "/userhome/cs/u3675384/llmA10/11967-hw10-dev-main/models/GPTNeoX-160m",
+  "output": "/userhome/cs/u3675384/llmA10/11967-hw10-dev-main/models/GPTNeoX-160M-WikiText-2048-scratch",
+  "results": "/userhome/cs/u3675384/llmA10/q13-results/hku/scratch",
+  "tokens_per_update": 16384
+}
+Mon Nov  9 11:07:21 UTC 2026
+gpu-4080-403
+a461d70f209192cc848acbfb9b6b79fa8fc660c8
+aea2ca48c2961bd0a5dcfb0d535d7eb2065191dd256e7083e611d4509afcf736  lm_train.py
+e6e85a8f1cfafafe138f55a85ef2f568513c39e555d06d1a6ea62380cd90495a  /userhome/cs/u3675384/llmA10/11967-hw10-dev-main/configs/2048_flash_gc_scratch_wikitext.json
+3a404de6fc25da2051b82deb74cefcde60ff62a81b54d745e4eca8ce4b17ba49  /userhome/cs/u3675384/llmA10/11967-hw10-dev-main/models/GPTNeoX-160m/model.safetensors
+c4f8cb87a70842b971ddf6ad5c1628dcb4b83012214da93310e57dfb87a72a3e  /userhome/cs/u3675384/llmA10/11967-hw10-dev-main/models/GPTNeoX-160m/modeling_custom.py
+index, uuid, name, memory.total [MiB], memory.used [MiB], utilization.gpu [%]
+0, GPU-c8f8aed3-fbb9-e8f4-9ab3-504daac96239, NVIDIA GeForce RTX 4080 SUPER, 16376 MiB, 1 MiB, 0 %
+2.4.1+cu124 NVIDIA GeForce RTX 4080 SUPER
+accelerate==0.34.2
+aiohappyeyeballs==2.7.1
+aiohttp==3.14.5
+aiosignal==1.4.0
+annotated-types==0.8.0
+anyio==4.16.0
+attrs==26.1.0
+certifi==2026.10.23
+charset-normalizer==3.5.2
+click==8.5.1
+cwevals==0.0.1b1
+datasets==3.0.1
+dill==0.3.8
+distro==1.9.0
+einops==0.8.2
+filelock==4.2.4
+flash-attn @ file:///tmp/.u3675384/hw10-flash-6q55y2fz/flash_attn-2.6.3%2Bcu123torch2.4cxx11abiFALSE-cp311-cp311-linux_x86_64.whl#sha256=25405479af3f6865c873ee3bbdfadcfccea9055355de78e7cd6b93170e9d4377
+frozenlist==1.8.0
+fsspec==2024.6.1
+googleapis-common-protos==1.76.0
+h11==0.16.0
+hf-xet==1.8.0
+httpcore==1.0.9
+httpx==0.28.1
+huggingface_hub==0.36.2
+idna==3.20
+iniconfig==2.3.1
+inquirerpy==0.3.4
+Jinja2==3.1.6
+MarkupSafe==3.0.3
+mpmath==1.3.0
+multidict==7.2.1
+multiprocess==0.70.16
+networkx==3.6.1
+numpy==1.26.4
+nvidia-cublas-cu12==12.4.2.65
+nvidia-cuda-cupti-cu12==12.4.99
+nvidia-cuda-nvrtc-cu12==12.4.99
+nvidia-cuda-runtime-cu12==12.4.99
+nvidia-cudnn-cu12==9.1.0.70
+nvidia-cufft-cu12==11.2.0.44
+nvidia-curand-cu12==10.3.5.119
+nvidia-cusolver-cu12==11.6.0.99
+nvidia-cusparse-cu12==12.3.0.142
+nvidia-nccl-cu12==2.20.5
+nvidia-nvjitlink-cu12==12.4.99
+nvidia-nvtx-cu12==12.4.99
+opentelemetry-api==1.45.2
+opentelemetry-exporter-http-transport==0.66b2
+opentelemetry-exporter-otlp-common==0.66b2
+opentelemetry-exporter-otlp-proto-common==1.45.2
+opentelemetry-exporter-otlp-proto-http==1.45.2
+opentelemetry-proto==1.45.2
+opentelemetry-sdk==1.45.2
+opentelemetry-semantic-conventions==0.66b2
+packaging @ file:///home/conda/feedstock_root/build_artifacts/bld/rattler-build_packaging_1785888127/work
+pandas==2.2.3
+pfzy==0.3.4
+platformdirs==4.14.5
+pluggy==1.7.0
+prompt_toolkit==3.0.53
+propcache==0.5.4
+protobuf==7.36.2
+psutil==7.2.2
+pyarrow==17.0.0
+pydantic==2.14.3
+pydantic_core==2.50.4
+Pygments==2.21.0
+pytest==8.4.2
+python-dateutil==4.0.0
+pytz==2026.6
+PyYAML==6.0.3
+regex==2026.11.9
+requests==2.34.2
+safetensors==0.8.0
+sniffio==1.3.1
+sympy==1.14.0
+tokenizers==0.20.3
+torch==2.4.1+cu124
+tqdm==4.70.1
+transformers==4.45.0
+triton==3.0.0
+typing-inspection==0.4.5
+typing_extensions==4.16.0
+tzdata==2026.6
+urllib3==2.8.0
+wandb==0.31.0
+wcwidth==0.9.4
+xxhash==4.0.2
+yarl==1.25.1
