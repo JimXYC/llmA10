@@ -1,0 +1,14 @@
+{
+  "repo": "jmvcoelho/GPTNeoX-160m",
+  "revision": "e3618df5be9a655761008a305a402f9819a50f05",
+  "files": [
+    "config.json",
+    "config_custom.py",
+    "generation_config.json",
+    "modeling_custom.py",
+    "model.safetensors",
+    "special_tokens_map.json",
+    "tokenizer.json",
+    "tokenizer_config.json"
+  ]
+}

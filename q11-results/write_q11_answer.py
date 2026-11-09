@@ -19,6 +19,7 @@ allocated = float(m['peak_allocated_mib'])
 reserved = float(m['peak_reserved_mib'])
 assert all(math.isfinite(v) and v > 0 for v in (p512, p2048, seconds, allocated, reserved))
 assert m['attention_type'] == 'eager' and m['seq_len'] == 512
+assert m['train']['epoch'] > 0.99, 'Refusing to report an incomplete or smoke-test run'
 sampled_peak = None
 if a.gpu_csv:
     with a.gpu_csv.open() as f:
@@ -69,8 +70,8 @@ if p2048 > p512:
         'represented in training. Although rotary position embeddings (RoPE) can be evaluated at these '
         'positions, the learned attention patterns need not extrapolate reliably. The additional '
         'context therefore does not guarantee lower perplexity for a model trained only at length 512. '
-        'The model can execute at length 2048; the issue is length generalization rather than a hard '
-        '512-position limit.\n\n'
+        'Continuing training at length 2048 would expose the model to the longer-range attention '
+        'patterns used at evaluation.\n\n'
     )
 else:
     reasoning = (

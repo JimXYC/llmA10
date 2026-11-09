@@ -6,7 +6,7 @@ Homework 10: Efficient Training and Inference (11-967).
 
 - `11_967_2026_homeworks-3.pdf`: assignment instructions.
 - `hw_10.pdf`: supplied answer-format template.
-- `Assignment.tex` and `Assignment.pdf`: recreated HW10 answer template, with the author's name and all question labels. Answers are pending measured experiment results.
+- `Assignment.tex` and `Assignment.pdf`: HW10 answer document with Q1.1 completed in English using the full experiment results. Q1.2 and Q1.3 remain blank.
 - `11967-hw10-dev-main/`: starter code and prepared Q1.1 configuration. Its README contains the original environment and model-download instructions.
 - `q11-results/backups/`: original training script and configuration before Q1.1 preparation.
 - `q11-results/run-q11.sh`: launcher for the previously configured GPU3 server; its activation path and GPU checks are server-specific and must be adapted before use on another cluster.
@@ -15,7 +15,29 @@ The HKU helper scripts install Q1.1 dependencies, perform a short eager-training
 
 ## Current status
 
-Q1.1 is prepared but **training has not started**. Q1.2 and Q1.3 remain unimplemented.
+**Q1.1 is complete.** The full run succeeded on an RTX 4080 SUPER on 2026-11-09. Q1.2 and Q1.3 remain unimplemented.
+
+| Metric | Measured result |
+| --- | ---: |
+| Validation perplexity, length 512 | 39.93 |
+| Validation perplexity, length 2048 | 137.58 |
+| Trainer runtime | 1594.7876 s (26.58 min) |
+| Peak training memory, PyTorch allocated | 13124.14 MiB |
+| Peak training memory, PyTorch reserved | 14132.00 MiB |
+| Peak device memory sampled over the full run | 14456 MiB |
+
+The Trainer completed all 3,609 configured optimizer steps. Its reported epoch is 0.999861 due to the incomplete final accumulation group. The input split contains 115,503 sequences (59,137,536 tokens). The completed model is preserved on the school server, and the GPU allocation has been released.
+
+`q11-results/hku/` contains the full-run metrics, Trainer state, exact training configuration, GPU samples, environment/code hashes, initialization revision, and clearly named preflight records. `measurement-summary.json` defines the timing and memory measurements. The actual Trainer path passed at batch size 16 with accumulation 2, including both validation lengths; batch size 32 exceeded the available GPU memory in the actual Trainer path.
+
+To regenerate only the English Q1.1 answer from the completed metrics:
+
+```bash
+python3 q11-results/write_q11_answer.py --metrics q11-results/hku/metrics.json --gpu-csv q11-results/hku/gpu-usage.csv
+pdflatex Assignment.tex
+```
+
+The report helper rejects incomplete/smoke-test runs. Review and render the compiled PDF after regenerating it.
 
 The Q1.1 configuration uses eager attention, sequence length 512, BF16, one epoch, per-device batch size 16 with 2 gradient accumulation steps (effective batch size 32), AdamW with learning rate 6e-4, weight decay 0.1, warmup ratio 0.01, cosine scheduling, and seed 42. The training script records validation perplexities at lengths 512 and 2048, Trainer runtime, and peak allocated/reserved CUDA memory in `q11_metrics.json` under the model output directory. Peak training memory is captured before the final evaluations; Trainer runtime includes epoch-end validation.
 

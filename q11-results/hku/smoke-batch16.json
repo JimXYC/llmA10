@@ -1,0 +1,15 @@
+{
+  "batch_size": 16,
+  "seq_len": 512,
+  "losses": [
+    11.0,
+    9.75,
+    9.0
+  ],
+  "seconds": 1.8264448223635554,
+  "peak_allocated_mib": 7138.4814453125,
+  "peak_reserved_mib": 7336.0,
+  "total_memory_mib": 15943.6875,
+  "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+  "torch": "2.4.1+cu124"
+}

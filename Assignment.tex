@@ -16,7 +16,27 @@
 \maketitle
 \section*{Question 1.1 (5 points)}
 \subsection*{1.1.A}
+I trained the supplied randomly initialized 160M-parameter GPTNeoX model for one epoch on the pre-tokenized WikiText training split (115,503 sequences of length 512; 59,137,536 tokens), using eager attention and BF16 on one NVIDIA GeForce RTX 4080 SUPER. The per-device batch size was 16, with 2 gradient accumulation steps (effective batch size 32). I used AdamW with peak learning rate $6\times10^{-4}$, $\beta_1=0.9$, $\beta_2=0.95$, weight decay 0.1, 1\% warmup, cosine decay, gradient clipping at 1.0, and seed 42. Gradient checkpointing was disabled.
+
+\begin{center}
+\begin{tabular}{lr}
+\toprule
+Metric & Measured value \\
+\midrule
+Validation perplexity, length 512 & 39.93 \\
+Validation perplexity, length 2048 & 137.58 \\
+Training time & 1594.79 s (26.58 min) \\
+Peak training VRAM, PyTorch allocated & 13124.14 MiB \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+Training time is the Hugging Face Trainer runtime, including epoch-end validation at length 512, and excluding model saving and the two final validation runs. Peak allocated memory was captured before the final validations; peak reserved CUDA memory over that interval was 14132.00 MiB. The maximum device VRAM sampled by \texttt{nvidia-smi} once per second over the full run, including final evaluation, was 14,456 MiB. All memory values are in MiB.
+
 \subsection*{1.1.B}
+The perplexity on the 2048-token set is higher (137.58 versus 39.93). This is consistent with a mismatch between training and evaluation context lengths. During training, the model sees positions 0--511 and relative attention distances up to 511. Evaluation at length 2048 introduces larger positions and relative distances that were not represented in training. Although rotary position embeddings (RoPE) can be evaluated at these positions, the learned attention patterns need not extrapolate reliably. The additional context therefore does not guarantee lower perplexity for a model trained only at length 512. Continuing training at length 2048 would expose the model to the longer-range attention patterns used at evaluation.
+
+\clearpage
 \section*{Question 1.2 (5 points)}
 \subsection*{1.2.A}
 \subsection*{1.2.B}

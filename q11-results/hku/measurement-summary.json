@@ -1,0 +1,17 @@
+{
+  "status": "complete",
+  "exit_code": 0,
+  "hardware": "NVIDIA GeForce RTX 4080 SUPER",
+  "ppl_512": 39.92832081321775,
+  "ppl_2048": 137.58455613280486,
+  "training_seconds": 1594.7876,
+  "peak_training_allocated_mib": 13124.1376953125,
+  "peak_training_reserved_mib": 14132.0,
+  "peak_full_run_device_sampled_mib": 14456.0,
+  "device_sampling_interval_seconds": 1,
+  "memory_units": "MiB (2^20 bytes)",
+  "timing_definition": "Hugging Face Trainer runtime; includes epoch-end 512-token validation; excludes saving and both final validations.",
+  "memory_definition": "PyTorch peaks captured at the end of train(), before saving/final evaluations; sampled device peak covers the full run.",
+  "model_preserved_on_server": true,
+  "gpu_allocation_released": true
+}
