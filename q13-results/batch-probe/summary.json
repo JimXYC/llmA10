@@ -1,0 +1,168 @@
+{
+  "eager_no_gc": {
+    "largest_successful_batch_size": 2,
+    "maximum_batch_size": 2,
+    "first_failing_batch_size": 3,
+    "search_cap": 64,
+    "maximum_confirmed": true,
+    "attempts": [
+      {
+        "mode": "eager_no_gc",
+        "batch_size": 1,
+        "seq_len": 2048,
+        "optimizer_steps": 3,
+        "gradient_accumulation_steps": 1,
+        "use_cache": false,
+        "status": "ok",
+        "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+        "torch": "2.4.1+cu124",
+        "train_runtime": 0.9499,
+        "peak_allocated_mib": 6373.19287109375,
+        "peak_reserved_mib": 6822.0
+      },
+      {
+        "mode": "eager_no_gc",
+        "batch_size": 2,
+        "seq_len": 2048,
+        "optimizer_steps": 3,
+        "gradient_accumulation_steps": 1,
+        "use_cache": false,
+        "status": "ok",
+        "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+        "torch": "2.4.1+cu124",
+        "train_runtime": 1.3002,
+        "peak_allocated_mib": 11591.06982421875,
+        "peak_reserved_mib": 12850.0
+      },
+      {
+        "mode": "eager_no_gc",
+        "batch_size": 4,
+        "seq_len": 2048,
+        "optimizer_steps": 3,
+        "gradient_accumulation_steps": 1,
+        "use_cache": false,
+        "status": "oom",
+        "error": "CUDA out of memory. Tried to allocate 768.00 MiB. GPU 0 has a total capacity of 15.57 GiB of which 90.56 MiB is free. Including non-PyTorch memory, this process has 15.47 GiB memory in use. Of the allocated memory 14.27 GiB is allocated by PyTorch, and 928.87 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+      },
+      {
+        "mode": "eager_no_gc",
+        "batch_size": 3,
+        "seq_len": 2048,
+        "optimizer_steps": 3,
+        "gradient_accumulation_steps": 1,
+        "use_cache": false,
+        "status": "oom",
+        "error": "CUDA out of memory. Tried to allocate 1.15 GiB. GPU 0 has a total capacity of 15.57 GiB of which 686.56 MiB is free. Including non-PyTorch memory, this process has 14.89 GiB memory in use. Of the allocated memory 14.16 GiB is allocated by PyTorch, and 445.00 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+      }
+    ]
+  },
+  "flash_gc": {
+    "largest_successful_batch_size": 9,
+    "maximum_batch_size": 9,
+    "first_failing_batch_size": 10,
+    "search_cap": 64,
+    "maximum_confirmed": true,
+    "attempts": [
+      {
+        "mode": "flash_gc",
+        "batch_size": 1,
+        "seq_len": 2048,
+        "optimizer_steps": 3,
+        "gradient_accumulation_steps": 1,
+        "use_cache": false,
+        "status": "ok",
+        "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+        "torch": "2.4.1+cu124",
+        "train_runtime": 0.6422,
+        "peak_allocated_mib": 2232.50537109375,
+        "peak_reserved_mib": 2644.0
+      },
+      {
+        "mode": "flash_gc",
+        "batch_size": 2,
+        "seq_len": 2048,
+        "optimizer_steps": 3,
+        "gradient_accumulation_steps": 1,
+        "use_cache": false,
+        "status": "ok",
+        "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+        "torch": "2.4.1+cu124",
+        "train_runtime": 0.6796,
+        "peak_allocated_mib": 3453.64111328125,
+        "peak_reserved_mib": 4090.0
+      },
+      {
+        "mode": "flash_gc",
+        "batch_size": 4,
+        "seq_len": 2048,
+        "optimizer_steps": 3,
+        "gradient_accumulation_steps": 1,
+        "use_cache": false,
+        "status": "ok",
+        "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+        "torch": "2.4.1+cu124",
+        "train_runtime": 0.8459,
+        "peak_allocated_mib": 5902.1591796875,
+        "peak_reserved_mib": 7826.0
+      },
+      {
+        "mode": "flash_gc",
+        "batch_size": 8,
+        "seq_len": 2048,
+        "optimizer_steps": 3,
+        "gradient_accumulation_steps": 1,
+        "use_cache": false,
+        "status": "ok",
+        "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+        "torch": "2.4.1+cu124",
+        "train_runtime": 1.3617,
+        "peak_allocated_mib": 10793.177734375,
+        "peak_reserved_mib": 15284.0
+      },
+      {
+        "mode": "flash_gc",
+        "batch_size": 16,
+        "seq_len": 2048,
+        "optimizer_steps": 3,
+        "gradient_accumulation_steps": 1,
+        "use_cache": false,
+        "status": "oom",
+        "error": "CUDA out of memory. Tried to allocate 6.14 GiB. GPU 0 has a total capacity of 15.57 GiB of which 4.59 GiB is free. Including non-PyTorch memory, this process has 10.97 GiB memory in use. Of the allocated memory 10.37 GiB is allocated by PyTorch, and 310.30 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+      },
+      {
+        "mode": "flash_gc",
+        "batch_size": 12,
+        "seq_len": 2048,
+        "optimizer_steps": 3,
+        "gradient_accumulation_steps": 1,
+        "use_cache": false,
+        "status": "oom",
+        "error": "CUDA out of memory. Tried to allocate 4.61 GiB. GPU 0 has a total capacity of 15.57 GiB of which 400.56 MiB is free. Including non-PyTorch memory, this process has 15.17 GiB memory in use. Of the allocated memory 10.71 GiB is allocated by PyTorch, and 4.16 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+      },
+      {
+        "mode": "flash_gc",
+        "batch_size": 10,
+        "seq_len": 2048,
+        "optimizer_steps": 3,
+        "gradient_accumulation_steps": 1,
+        "use_cache": false,
+        "status": "oom",
+        "error": "CUDA out of memory. Tried to allocate 3.84 GiB. GPU 0 has a total capacity of 15.57 GiB of which 2.45 GiB is free. Including non-PyTorch memory, this process has 13.11 GiB memory in use. Of the allocated memory 9.09 GiB is allocated by PyTorch, and 3.71 GiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)"
+      },
+      {
+        "mode": "flash_gc",
+        "batch_size": 9,
+        "seq_len": 2048,
+        "optimizer_steps": 3,
+        "gradient_accumulation_steps": 1,
+        "use_cache": false,
+        "status": "ok",
+        "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+        "torch": "2.4.1+cu124",
+        "train_runtime": 1.5364,
+        "peak_allocated_mib": 12018.25732421875,
+        "peak_reserved_mib": 15384.0
+      }
+    ]
+  }
+}

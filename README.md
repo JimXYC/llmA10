@@ -15,7 +15,7 @@ The HKU helper scripts install Q1.1 dependencies, perform a short eager-training
 
 ## Current status
 
-**Q1.1 is complete.** The full run succeeded on an RTX 4080 SUPER on 2026-11-09. Q1.2 code is implemented and CUDA-validated (36 passed, 0 skipped). Full Q1.2 training and the English report are complete; Q1.3 code/configurations are prepared; GPU probing and both training runs remain pending.
+**Q1.1 is complete.** The full run succeeded on an RTX 4080 SUPER on 2026-11-09. Q1.2 code is implemented and CUDA-validated (36 passed, 0 skipped). Full Q1.2 training and the English report are complete; Q1.3 memory probing is complete; the continuation and scratch runs are now executing sequentially.
 
 | Metric | Measured result |
 | --- | ---: |
@@ -142,3 +142,9 @@ Each training command runs exactly one variant. Logs, the actual config, environ
 `q13-results/runtime-estimate.json` is explicitly a **planning estimate**, not a Q1.3 measurement. Based on Q1.2's measured 16.30 minutes and the supplied model's leading matrix-multiply costs, equal total tokens with longer attention and recomputation give a compute-only center around 24.5 minutes per run. Budget **25–40 minutes per training run**, **50–80 minutes for the two runs**, plus roughly **5–15 minutes for memory probing**, excluding queueing and initial environment/download work. The longer-length split contains 58,431,488 tokens, close to Q1.2's 59,137,536, so quadrupling context length does not quadruple the epoch's token count. The estimate assumes the same RTX 4080 SUPER and may change with the feasible batch size, kernel efficiency and allocator behavior.
 
 Gradient-checkpointing reference: [Hugging Face documentation](https://huggingface.co/docs/transformers/grad_checkpointing). Keyword support in the project's pinned version: [Transformers 4.45.0 TrainingArguments](https://github.com/huggingface/transformers/blob/v4.45.0/src/transformers/training_args.py).
+
+## Q1.3 execution in progress
+
+The user subsequently authorized the full Q1.3 workflow. The completed three-step BF16 training-memory probe on the RTX 4080 SUPER found eager/no-checkpointing batch 2 succeeded and batch 3 failed with CUDA OOM; FlashAttention/checkpointing batch 9 succeeded and batch 10 failed. Raw JSON evidence is in `q13-results/batch-probe/`.
+
+Both complete runs retain the conservative batch 4 / accumulation 2 settings. They run sequentially within the same allocated GPU session, with separate checkpoints and metrics. `q13-results/before-training.json` records the pretraining explanation and batch choice. The result-only report helper `q13-results/write_q13_answer.py` refuses incomplete runs and fills Q1.3.A–E after both full runs succeed. The earlier runtime estimate remains labelled as an estimate, not a measurement.

@@ -1,0 +1,14 @@
+{
+  "mode": "flash_gc",
+  "batch_size": 2,
+  "seq_len": 2048,
+  "optimizer_steps": 3,
+  "gradient_accumulation_steps": 1,
+  "use_cache": false,
+  "status": "ok",
+  "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+  "torch": "2.4.1+cu124",
+  "train_runtime": 0.6796,
+  "peak_allocated_mib": 3453.64111328125,
+  "peak_reserved_mib": 4090.0
+}

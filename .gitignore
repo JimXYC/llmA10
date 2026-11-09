@@ -43,3 +43,5 @@ tmp/
 **/configs/smoke-trainer*.json
 
 **/.pytest_cache/
+
+**/run.lock

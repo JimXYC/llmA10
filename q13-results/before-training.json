@@ -1,0 +1,16 @@
+{
+  "phase": "before_full_q13_training",
+  "gradient_checkpointing_explanation": [
+    "Gradient checkpointing stores selected activations during the forward pass and recomputes missing intermediates during backpropagation.",
+    "It reduces activation memory at the cost of additional computation, which can make training slower."
+  ],
+  "reference": "https://github.com/cybertronai/gradient-checkpointing",
+  "chosen_training_batch": 4,
+  "gradient_accumulation_steps": 2,
+  "tokens_per_update": 16384,
+  "measured_largest_batches": {
+    "eager_no_gc": 2,
+    "flash_gc": 9
+  },
+  "probe_conditions": "Actual Trainer BF16, length 2048, three optimizer steps per isolated candidate; same Q1.2 checkpoint; KV cache disabled in both modes."
+}
