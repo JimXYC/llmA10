@@ -1,0 +1,29 @@
+{
+  "status": "planning_estimate_not_a_q13_measurement",
+  "hardware": "NVIDIA GeForce RTX 4080 SUPER",
+  "baseline_q12_minutes": 16.304633333333335,
+  "baseline_tokens": 59137536,
+  "q13_training_examples": 28531,
+  "q13_tokens": 58431488,
+  "assumed_architecture": {
+    "hidden_size": 768,
+    "layers": 12,
+    "vocab_size": 50304
+  },
+  "approximate_compute_multiplier": 1.5021739131964966,
+  "central_compute_only_minutes_per_run": 24.492394857567376,
+  "planned_minutes_per_run": [
+    25,
+    40
+  ],
+  "two_training_runs_minutes": [
+    50,
+    80
+  ],
+  "batch_probe_extra_minutes": [
+    5,
+    15
+  ],
+  "conditions": "One epoch per variant, existing school environment and RTX 4080 SUPER; batch 4 x accumulation 2. Excludes queueing/download/setup.",
+  "uncertainty": "Not benchmarked at 2048 with checkpointing. Kernel efficiency, allocator behavior and a smaller feasible batch can change runtime. Refine only after an explicitly authorized GPU probe/run."
+}

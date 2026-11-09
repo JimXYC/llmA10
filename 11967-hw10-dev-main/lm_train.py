@@ -54,6 +54,10 @@ model = AutoModelForCausalLM.from_pretrained(model_config.model_to_train,
                                              attn_implementation=model_config.attention_type,
                                              trust_remote_code=True)
 
+# Generation KV caching is unnecessary during checkpointed training.
+if training_args.gradient_checkpointing:
+    model.config.use_cache = False
+
 tokenizer = AutoTokenizer.from_pretrained(model_config.model_to_train)
 tokenizer.pad_token = tokenizer.eos_token
 
@@ -108,6 +112,8 @@ metrics = {
     "torch_version": torch.__version__,
     "seq_len": model_config.seq_len,
     "attention_type": model_config.attention_type,
+    "gradient_checkpointing": training_args.gradient_checkpointing,
+    "gradient_checkpointing_kwargs": training_args.gradient_checkpointing_kwargs,
     "train_examples": len(train_dataset),
     "train_tokens": sum(len(row["input_ids"]) for row in train_dataset),
 }

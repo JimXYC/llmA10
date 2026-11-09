@@ -1,0 +1,9 @@
+{
+  "status": "code_prepared_not_gpu_executed",
+  "local_cpu_planning_tests": 8,
+  "tests_failed": 0,
+  "gpu_allocations_created": 0,
+  "memory_probe_executed": false,
+  "full_q13_training_started": false,
+  "note": "Only stdlib planning/search and dry-run tests were executed; 2048/checkpointed GPU behavior and maximum batch sizes remain unmeasured."
+}

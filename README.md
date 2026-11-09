@@ -15,7 +15,7 @@ The HKU helper scripts install Q1.1 dependencies, perform a short eager-training
 
 ## Current status
 
-**Q1.1 is complete.** The full run succeeded on an RTX 4080 SUPER on 2026-11-09. Q1.2 code is implemented and CUDA-validated (36 passed, 0 skipped). Full Q1.2 training and the English report are complete; Q1.3 remains pending.
+**Q1.1 is complete.** The full run succeeded on an RTX 4080 SUPER on 2026-11-09. Q1.2 code is implemented and CUDA-validated (36 passed, 0 skipped). Full Q1.2 training and the English report are complete; Q1.3 code/configurations are prepared; GPU probing and both training runs remain pending.
 
 | Metric | Measured result |
 | --- | ---: |
@@ -104,3 +104,41 @@ The FlashAttention run completed all 3,609 configured optimization steps on an R
 Flash training was 1.63x as fast (38.7% less runtime), with 26.2% lower peak training tensor allocation. The sampled whole-run device peak was higher and occurred in the last two samples; it includes the final evaluation period and allocator-reserved memory, so it is distinguished explicitly from training allocation. The report preserves this measurement distinction.
 
 Complete-run evidence is in `q12-results/hku/`; the pretraining 36-test code-validation record remains in `q12-results/validation.json`. `Assignment.tex`/`Assignment.pdf` now contain English answers for Q1.2.A/B/C and retain Q1.1. All three PDF pages were rendered and visually checked. The Q1.2 model remains on the school server for Q1.3, and the GPU session has been released.
+
+## Q1.3 code preparation — not executed
+
+No Q1.3 GPU allocation, memory probe, optimization step or training run was started during this code-preparation task. `Assignment.tex`/`Assignment.pdf` retain their existing Q1.1/Q1.2 answers; Q1.3 answers await real experiments.
+
+Two configurations are provided:
+
+- `configs/2048_flash_gc_retrofit_wikitext.json` starts from the saved Q1.2 model for Q1.3.C/D.
+- `configs/2048_flash_gc_scratch_wikitext.json` starts from the original supplied initialization for Q1.3.E.
+
+Both use length 2048, FlashAttention 2, non-reentrant gradient checkpointing, BF16, one epoch, tentative per-device batch 4 and accumulation 2 (16,384 tokens/update, matching Q1.2), peak learning rate 1e-4, and eval batch 2. The lower learning rate is a conservative continuation choice; the scratch control keeps the identical hyperparameters. The two configurations differ only in initialization and output/run names. The batch size is **not yet GPU-validated**. Checkpointed training explicitly disables generation KV caching.
+
+Planning commands are safe to run locally and do not import ML packages or create model/results directories:
+
+```bash
+cd 11967-hw10-dev-main
+python3 scripts/run_q13.py retrofit --dry-run
+python3 scripts/run_q13.py scratch --dry-run
+python3 scripts/probe_q13_batch_size.py --dry-run
+python3 -m unittest discover -s tests -p test_q13_planning.py -v
+```
+
+After the user later authorizes GPU execution, use an existing `gpu-interactive` session and the HW10 environment. The Q1.3.A probe performs **real short training steps** on disposable model instances, including optimizer-state allocation and the same Hugging Face Trainer BF16 path. It compares eager/no-checkpointing with FlashAttention/checkpointing at length 2048 using the same Q1.2 starting checkpoint, disabling KV caching in both cases. Each candidate gets a fresh process and no checkpoint weights are saved. CUDA OOM is the only failure treated as a memory boundary; other errors/timeouts abort the search. The exponential/binary search reports a confirmed maximum only when a successful batch and the next failing batch bracket it; reaching `--cap` produces an unconfirmed lower bound. These three-step limits describe the tested setup and do not guarantee long-run headroom.
+
+**The following commands execute GPU work and have not been run yet:**
+
+```bash
+$HOME/hw10-env/bin/python scripts/probe_q13_batch_size.py --cap 64
+# Adjust both paired configs consistently if the measured memory budget requires it.
+bash scripts/launch_q13_hku.sh retrofit
+bash scripts/launch_q13_hku.sh scratch
+```
+
+Each training command runs exactly one variant. Logs, the actual config, environment/source hashes, 1-second device-memory samples and completed metrics are isolated under `q13-results/hku/{variant}/`. Models are saved to separate `models/...2048-{variant}` folders. The runner preserves scheduler GPU visibility, checks the allocation, guards existing artifacts against overwriting, and returns to the allocated shell when done; exit that GPU session after both runs. The shared training script retains its legacy `q11_metrics.json` output filename internally; the Q1.3 runner copies it to the appropriate variant's `metrics.json`.
+
+`q13-results/runtime-estimate.json` is explicitly a **planning estimate**, not a Q1.3 measurement. Based on Q1.2's measured 16.30 minutes and the supplied model's leading matrix-multiply costs, equal total tokens with longer attention and recomputation give a compute-only center around 24.5 minutes per run. Budget **25–40 minutes per training run**, **50–80 minutes for the two runs**, plus roughly **5–15 minutes for memory probing**, excluding queueing and initial environment/download work. The longer-length split contains 58,431,488 tokens, close to Q1.2's 59,137,536, so quadrupling context length does not quadruple the epoch's token count. The estimate assumes the same RTX 4080 SUPER and may change with the feasible batch size, kernel efficiency and allocator behavior.
+
+Gradient-checkpointing reference: [Hugging Face documentation](https://huggingface.co/docs/transformers/grad_checkpointing). Keyword support in the project's pinned version: [Transformers 4.45.0 TrainingArguments](https://github.com/huggingface/transformers/blob/v4.45.0/src/transformers/training_args.py).
