@@ -22,6 +22,9 @@ fi
 export WANDB_MODE=offline
 export WANDB_DIR="$A10_RESULTS"
 export HF_HUB_DISABLE_XET=1
+# All dataset splits were populated by the preflight check.
+export HF_HUB_OFFLINE=1
+export HF_DATASETS_OFFLINE=1
 export TOKENIZERS_PARALLELISM=false
 export OMP_NUM_THREADS=4
 export PYTHONUNBUFFERED=1
