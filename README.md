@@ -15,7 +15,7 @@ The HKU helper scripts install Q1.1 dependencies, perform a short eager-training
 
 ## Current status
 
-**Q1.1 is complete.** The full run succeeded on an RTX 4080 SUPER on 2026-11-09. Q1.2 code is implemented and CUDA-validated (36 passed, 0 skipped). Q1.2 full training and Q1.3 remain pending.
+**Q1.1 is complete.** The full run succeeded on an RTX 4080 SUPER on 2026-11-09. Q1.2 code is implemented and CUDA-validated (36 passed, 0 skipped). Full Q1.2 training is running on the school RTX 4080 SUPER; Q1.3 remains pending.
 
 | Metric | Measured result |
 | --- | ---: |
@@ -84,6 +84,6 @@ The installer selects the matching wheel from the official FlashAttention 2.6.3 
 $HOME/hw10-env/bin/python lm_train.py configs/512_flash_wikitext.json
 ```
 
-Full Q1.2 training has not been run as part of the code-only implementation.
+Full Q1.2 training was started after the code-only validation. Its launcher is `scripts/launch_q12_hku.sh`, with isolated results under `q12-results/hku/`. The completed-run helper `q12-results/write_q12_answer.py` fills Q1.2.A/B/C after successful training and computes comparisons from the saved Q1.1 baseline.
 
 CUDA validation completed on the school RTX 4080 SUPER: **36 passed, 0 failed, 0 skipped**, including a real 160M-model forward/backward check. `q12-results/validation.json`, `junit.xml`, and `flash-install.json` record the tested source hashes and environment. Tolerances derive from the dtype epsilon; gradient comparisons use scale-invariant L2 and maximum-error criteria to avoid false failures at cancellation near zero. The causal-prefix test requires exact equality. Representative FP32 gradient diagnostics are also retained.
