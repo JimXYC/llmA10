@@ -6,6 +6,7 @@ Use --dry-run to inspect the plan without ML imports, CUDA or output writes.
 import argparse
 import fcntl
 import json
+import math
 import os
 import subprocess
 import sys
@@ -46,12 +47,14 @@ def worker(a):
                 gradient_checkpointing=enabled, gradient_checkpointing_kwargs={'use_reentrant':False} if enabled else None,
                 learning_rate=1e-4, optim='adamw_torch', adam_beta1=0.9, adam_beta2=0.95,
                 weight_decay=0.1, seed=42, data_seed=42, report_to='none',
-                save_strategy='no', eval_strategy='no', logging_strategy='no',
+                save_strategy='no', eval_strategy='no', logging_strategy='no', logging_nan_inf_filter=False,
                 dataloader_num_workers=0, disable_tqdm=True)
             trainer = Trainer(model=model, args=args, train_dataset=dataset,
                               data_collator=DataCollatorForLanguageModeling(tokenizer, mlm=False), tokenizer=tokenizer)
             torch.cuda.reset_peak_memory_stats()
             result = trainer.train()
+            if trainer.state.global_step != a.steps or not math.isfinite(result.metrics['train_loss']):
+                raise RuntimeError('Incomplete or non-finite probe; no memory limit inferred.')
             torch.cuda.synchronize()
             record.update(status='ok', gpu=torch.cuda.get_device_name(0), torch=torch.__version__,
                           train_runtime=result.metrics['train_runtime'],
