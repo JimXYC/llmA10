@@ -1,0 +1,23 @@
+{
+  "ppl_512": 39.97306920187117,
+  "ppl_2048": 137.02339949953284,
+  "training_seconds": 978.278,
+  "speedup": 1.6301987778525124,
+  "runtime_reduction_percent": 38.65778740692492,
+  "allocated_memory_reduction_percent": 26.224535436368324,
+  "peak_allocated_mib": 9682.3935546875,
+  "peak_reserved_mib": 10614.0,
+  "peak_full_run_device_sampled_mib": 15654.0,
+  "timing_definition": "Same as Q1.1; Trainer runtime includes epoch-end 512-token evaluation.",
+  "memory_definition": "Training PyTorch peaks before final evaluations; sampled device peak over full run.",
+  "status": "complete",
+  "exit_code": 0,
+  "global_steps": 3609,
+  "configured_max_steps": 3609,
+  "gpu": "NVIDIA GeForce RTX 4080 SUPER",
+  "torch": "2.4.1+cu124",
+  "flash_attention": "2.6.3",
+  "saved_model_preserved": true,
+  "gpu_allocation_released": true,
+  "device_peak_note": "The 15654 MiB device high-water mark occurs in the final two 1-second samples of the full run. It is not the training tensor-allocation peak."
+}

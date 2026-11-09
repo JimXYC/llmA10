@@ -39,8 +39,38 @@ The perplexity on the 2048-token set is higher (137.58 versus 39.93). This is co
 \clearpage
 \section*{Question 1.2 (5 points)}
 \subsection*{1.2.A}
+I completed \texttt{GPTNeoXFlashAttention2.forward()} in the supplied custom model. Q/K/V are transposed from [batch, heads, sequence, head dimension] to [batch, sequence, heads, head dimension]. The helper \nolinkurl{_flash_attention_forward} receives the padding mask, causal-alignment flag and train/eval dropout. Its output heads are merged before the final projection.
+
+I wrote 36 CUDA tests, all of which passed with no skips on an RTX 4080 SUPER using PyTorch 2.4.1 and FlashAttention 2.6.3. Small two-layer models with identical weights compare eager and flash logits, losses and every parameter gradient in FP16/BF16, with an additional FP32 eager reference. Coverage includes batch sizes 1/2, lengths 1/17/512/2048, left/right padding, strict causal non-leakage, and single/multiple-token cached decoding. Separate checks cover train/eval dropout and a real 160M-checkpoint forward/backward pass. Consistency comparisons disable dropout and use dtype-dependent tolerances; the causal-prefix check requires exact equality. Gradient comparisons use relative L2 and normalized maximum errors to handle cancellation near zero.
+
 \subsection*{1.2.B}
+I trained from the same supplied initialization for one epoch, keeping all Q1.1 hyperparameters and the same GPU model. Only the attention backend was changed to FlashAttention 2; gradient checkpointing remained disabled.
+
+\begin{center}
+\begin{tabular}{lrr}
+\toprule
+Metric & Q1.1: eager & Q1.2: flash \\
+\midrule
+Validation perplexity, length 512 & 39.93 & 39.97 \\
+Validation perplexity, length 2048 & 137.58 & 137.02 \\
+Training time (seconds) & 1594.79 & 978.28 \\
+Peak training allocated VRAM (MiB) & 13124.14 & 9682.39 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The flash run took 16.30 minutes. Timing and memory definitions match Q1.1: Trainer runtime includes epoch-end 512-token validation and excludes model saving and the final validations; the allocated-memory peak is captured before those final validations. Flash peak reserved CUDA memory was 10614 MiB. The device-memory peak sampled once per second over the full flash run was 15,654 MiB.
+
 \subsection*{1.2.C}
+The perplexities are similar across the two attention backends. FlashAttention computes the same mathematical attention operation, while floating-point reduction order and low-precision rounding can change individual updates and the resulting training trajectory. The much higher 2048-token perplexity persists because both models were trained only at length 512.
+
+Flash training was 1.63 times as fast, reducing measured runtime by 38.7\%. Peak allocated training memory fell by 26.2\%.
+
+The full-run device high-water mark was higher (15,654 versus 14,456 MiB), with the flash peak occurring at the end of the run. This measure includes \href{https://docs.pytorch.org/docs/2.4/notes/cuda.html#memory-management}{unused allocator blocks} and covers final evaluation, while the training tensor-allocation peak is captured beforehand.
+
+FlashAttention tiles Q/K/V computation and performs online softmax using on-chip memory, avoiding the storage of a complete sequence-by-sequence attention matrix in GPU global memory. During backpropagation it recomputes attention intermediates from these tiles. This reduces attention-intermediate memory and global-memory traffic. Attention arithmetic remains quadratic in sequence length. FlashAttention-2 also improves GPU occupancy and work partitioning while reducing non-matmul work and inter-warp communication. These mechanisms explain potential speed and memory gains; other model operations and runtime overhead limit the end-to-end improvement. See \href{https://arxiv.org/abs/2205.14135}{Dao et al. (2022)} and \href{https://arxiv.org/abs/2307.08691}{Dao (2023)}.
+
+\clearpage
 \section*{Question 1.3 (5 points)}
 \subsection*{1.3.A}
 \subsection*{1.3.B}

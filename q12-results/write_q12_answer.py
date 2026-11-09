@@ -31,7 +31,7 @@ with (root/'q12-results/hku/gpu-usage.csv').open() as f:
     next(rows)
     sampled_peak = max(float(r[2].split()[0]) for r in rows if len(r) >= 4)
 part_a = r'''\subsection*{1.2.A}
-I completed \texttt{GPTNeoXFlashAttention2.forward()} in the supplied custom model. The implementation transposes Q/K/V from [batch, heads, sequence, head dimension] to the layout required by \texttt{\_flash\_attention\_forward}, passes the padding mask, causal-alignment flag and train/eval dropout, and merges the resulting heads before the output projection.
+I completed \texttt{GPTNeoXFlashAttention2.forward()} in the supplied custom model. Q/K/V are transposed from [batch, heads, sequence, head dimension] to [batch, sequence, heads, head dimension]. The helper \nolinkurl{_flash_attention_forward} receives the padding mask, causal-alignment flag and train/eval dropout. Its output heads are merged before the final projection.
 
 I wrote 36 CUDA tests, all of which passed with no skips on an RTX 4080 SUPER using PyTorch 2.4.1 and FlashAttention 2.6.3. Small two-layer models with identical weights compare eager and flash logits, losses and every parameter gradient in FP16/BF16, with an additional FP32 eager reference. Coverage includes batch sizes 1/2, lengths 1/17/512/2048, left/right padding, strict causal non-leakage, and single/multiple-token cached decoding. Separate checks cover train/eval dropout and a real 160M-checkpoint forward/backward pass. Consistency comparisons disable dropout and use dtype-dependent tolerances; the causal-prefix check requires exact equality. Gradient comparisons use relative L2 and normalized maximum errors to handle cancellation near zero.
 
@@ -70,6 +70,13 @@ if alloc < old_alloc:
     part_c += f'Peak allocated training memory fell by {100*(1-alloc/old_alloc):.1f}\\%.\n\n'
 else:
     part_c += f'Peak allocated training memory changed by {100*(alloc/old_alloc-1):+.1f}\\%.\n\n'
+with (root/'q11-results/hku/gpu-usage.csv').open() as f:
+    rows = csv.reader(f)
+    next(rows)
+    old_sampled_peak = max(float(r[2].split()[0]) for r in rows if len(r) >= 4)
+if sampled_peak > old_sampled_peak:
+    part_c += (f'The full-run device high-water mark was higher ({sampled_peak:,.0f} versus {old_sampled_peak:,.0f} MiB), with the flash peak occurring at the end of the run. '
+               'This measure includes \\href{https://docs.pytorch.org/docs/2.4/notes/cuda.html#memory-management}{unused allocator blocks} and covers final evaluation, while the training tensor-allocation peak is captured beforehand.\n\n')
 part_c += r'''FlashAttention tiles Q/K/V computation and performs online softmax using on-chip memory, avoiding the storage of a complete sequence-by-sequence attention matrix in GPU global memory. During backpropagation it recomputes attention intermediates from these tiles. This reduces attention-intermediate memory and global-memory traffic. Attention arithmetic remains quadratic in sequence length. FlashAttention-2 also improves GPU occupancy and work partitioning while reducing non-matmul work and inter-warp communication. These mechanisms explain potential speed and memory gains; other model operations and runtime overhead limit the end-to-end improvement. See \href{https://arxiv.org/abs/2205.14135}{Dao et al. (2022)} and \href{https://arxiv.org/abs/2307.08691}{Dao (2023)}.
 
 '''

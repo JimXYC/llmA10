@@ -6,7 +6,7 @@ Homework 10: Efficient Training and Inference (11-967).
 
 - `11_967_2026_homeworks-3.pdf`: assignment instructions.
 - `hw_10.pdf`: supplied answer-format template.
-- `Assignment.tex` and `Assignment.pdf`: HW10 answer document with Q1.1 completed in English using the full experiment results. Q1.2 and Q1.3 remain blank.
+- `Assignment.tex` and `Assignment.pdf`: HW10 answer document with Q1.1 and Q1.2 completed in English using full experiment results. Q1.3 remains blank.
 - `11967-hw10-dev-main/`: starter code and prepared Q1.1 configuration. Its README contains the original environment and model-download instructions.
 - `q11-results/backups/`: original training script and configuration before Q1.1 preparation.
 - `q11-results/run-q11.sh`: launcher for the previously configured GPU3 server; its activation path and GPU checks are server-specific and must be adapted before use on another cluster.
@@ -15,7 +15,7 @@ The HKU helper scripts install Q1.1 dependencies, perform a short eager-training
 
 ## Current status
 
-**Q1.1 is complete.** The full run succeeded on an RTX 4080 SUPER on 2026-11-09. Q1.2 code is implemented and CUDA-validated (36 passed, 0 skipped). Full Q1.2 training is running on the school RTX 4080 SUPER; Q1.3 remains pending.
+**Q1.1 is complete.** The full run succeeded on an RTX 4080 SUPER on 2026-11-09. Q1.2 code is implemented and CUDA-validated (36 passed, 0 skipped). Full Q1.2 training and the English report are complete; Q1.3 remains pending.
 
 | Metric | Measured result |
 | --- | ---: |
@@ -84,6 +84,23 @@ The installer selects the matching wheel from the official FlashAttention 2.6.3 
 $HOME/hw10-env/bin/python lm_train.py configs/512_flash_wikitext.json
 ```
 
-Full Q1.2 training was started after the code-only validation. Its launcher is `scripts/launch_q12_hku.sh`, with isolated results under `q12-results/hku/`. The completed-run helper `q12-results/write_q12_answer.py` fills Q1.2.A/B/C after successful training and computes comparisons from the saved Q1.1 baseline.
+Full Q1.2 training completed successfully after the code-only validation. Its launcher is `scripts/launch_q12_hku.sh`, with isolated results under `q12-results/hku/`. The completed-run helper `q12-results/write_q12_answer.py` fills Q1.2.A/B/C after successful training and computes comparisons from the saved Q1.1 baseline.
 
 CUDA validation completed on the school RTX 4080 SUPER: **36 passed, 0 failed, 0 skipped**, including a real 160M-model forward/backward check. `q12-results/validation.json`, `junit.xml`, and `flash-install.json` record the tested source hashes and environment. Tolerances derive from the dtype epsilon; gradient comparisons use scale-invariant L2 and maximum-error criteria to avoid false failures at cancellation near zero. The causal-prefix test requires exact equality. Representative FP32 gradient diagnostics are also retained.
+
+## Completed Q1.2 full-run results
+
+The FlashAttention run completed all 3,609 configured optimization steps on an RTX 4080 SUPER, retaining the same initialization, effective batch size 32 and other Q1.1 hyperparameters.
+
+| Metric | Q1.1 eager | Q1.2 flash |
+| --- | ---: | ---: |
+| Validation perplexity, length 512 | 39.93 | 39.97 |
+| Validation perplexity, length 2048 | 137.58 | 137.02 |
+| Trainer runtime (seconds) | 1594.7876 | 978.2780 |
+| Peak training allocated memory (MiB) | 13124.14 | 9682.39 |
+| Peak training reserved memory (MiB) | 14132 | 10614 |
+| Peak device memory sampled across the full run (MiB) | 14456 | 15654 |
+
+Flash training was 1.63x as fast (38.7% less runtime), with 26.2% lower peak training tensor allocation. The sampled whole-run device peak was higher and occurred in the last two samples; it includes the final evaluation period and allocator-reserved memory, so it is distinguished explicitly from training allocation. The report preserves this measurement distinction.
+
+Complete-run evidence is in `q12-results/hku/`; the pretraining 36-test code-validation record remains in `q12-results/validation.json`. `Assignment.tex`/`Assignment.pdf` now contain English answers for Q1.2.A/B/C and retain Q1.1. All three PDF pages were rendered and visually checked. The Q1.2 model remains on the school server for Q1.3, and the GPU session has been released.
