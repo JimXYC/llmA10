@@ -1,0 +1,38 @@
+# Local connection/authentication files
+.gpu-connection/
+.ssh/
+.env
+.env.*
+*.pem
+*.key
+*.netrc
+
+# Machine-specific records
+q11-results/STATUS.md
+q11-results/hku-farm-inspection.json
+
+# Downloaded models/data and local environments
+**/models/
+**/.cache/
+**/.venv/
+**/venv/
+**/wandb/
+*.safetensors
+*.pt
+*.pth
+*.ckpt
+
+# Temporary build outputs and logs
+.DS_Store
+**/__pycache__/
+*.py[cod]
+tmp/
+*.aux
+*.out
+*.log
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# Original archive duplicates the extracted starter code
+11967-HW10-StarterCode.zip
